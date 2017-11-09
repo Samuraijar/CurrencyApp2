@@ -30,11 +30,11 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String urlJsonObj = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD,EUR,JPY,CHF,AUD,HKD,NGN,CNY,NZD,BRL,KRW,GBP,SEK,MXN,SDG,NOK,INR,TRY,RUB,NOK";
+    String urlJsonObj;
     RequestQueue requestQueue;
     RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter;
-    List<CurrencyDetails> currencyDetails = new ArrayList<CurrencyDetails>();
+    List<CurrencyDetails> currencyDetails = new ArrayList<>();
 
 
     @Override
@@ -45,12 +45,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewAdapter = new RecyclerViewAdapter(this, currencyDetails);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerViewAdapter);
-        requestQueue =  AppController.getInstance(this).getRequestQueue();
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        urlJsonObj = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD,EUR,JPY,CHF,CAD,AUD,HKD,NGN,CNY,NZD,BRL,KRW,NOK,GBP,SEK,MXN,SGD,INR,ZAR,INS";
 
         makeJsonObjectRequest();
     }
 
-    void makeJsonObjectRequest() {
+   public void makeJsonObjectRequest() {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Method.GET, urlJsonObj, null, new Response.Listener<JSONObject>() {
 
@@ -88,5 +89,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         requestQueue.add(jsonObjectRequest);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        requestQueue.cancelAll(this);
     }
 }
