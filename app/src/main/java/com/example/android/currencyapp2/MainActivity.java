@@ -30,11 +30,12 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-    String urlJsonObj;
+    String urlJsonObj = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD,EUR,JPY,CHF,CAD,AUD,HKD,NGN,CNY,NZD,BRL,KRW,NOK,GBP,SEK,MXN,SGD,INR,ZAR,INS";
     RequestQueue requestQueue;
     RecyclerView recyclerView;
-    RecyclerViewAdapter recyclerViewAdapter;
     List<CurrencyDetails> currencyDetails = new ArrayList<>();
+    RecyclerViewAdapter recyclerViewAdapter;
+
 
 
     @Override
@@ -42,21 +43,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapter(this, currencyDetails);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.smoothScrollToPosition(0);
+        recyclerViewAdapter = new RecyclerViewAdapter(this,  currencyDetails);
         recyclerView.setAdapter(recyclerViewAdapter);
+
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-        urlJsonObj = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH&tsyms=USD,EUR,JPY,CHF,CAD,AUD,HKD,NGN,CNY,NZD,BRL,KRW,NOK,GBP,SEK,MXN,SGD,INR,ZAR,INS";
 
-        makeJsonObjectRequest();
-    }
-
-   public void makeJsonObjectRequest() {
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Method.GET, urlJsonObj, null, new Response.Listener<JSONObject>() {
+        //making internet call to get data..
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlJsonObj, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        //parsing json object response using iterator to get json object nodes..
 
                         try {
                             JSONObject btc = response.getJSONObject("BTC".trim());
@@ -75,7 +74,13 @@ public class MainActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
 
+                            //telling recyclerview to update content..
+                        } finally {
+                            recyclerViewAdapter.notifyItemChanged(currencyDetails.size());
+
                         }
+
+
 
                     }
                 }, new Response.ErrorListener() {
@@ -87,13 +92,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+        //this makes sure request runs in background
 
         requestQueue.add(jsonObjectRequest);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        requestQueue.cancelAll(this);
-    }
+
 }

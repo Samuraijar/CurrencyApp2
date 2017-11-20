@@ -6,10 +6,9 @@ package com.example.android.currencyapp2;
 
 public class CurrencyDetails {
     public String flag;
-    public Double btcValue;
-    public Double ethValue;
+    public double btcValue, ethValue;
 
-    public CurrencyDetails(String flag, Double btcValue, Double ethValue) {
+    public CurrencyDetails(String flag, double btcValue, double ethValue) {
         this.flag = flag;
         this.btcValue = btcValue;
         this.ethValue = ethValue;
